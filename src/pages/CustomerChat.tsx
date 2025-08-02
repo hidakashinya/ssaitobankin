@@ -65,7 +65,8 @@ export function CustomerChat() {
           headers: {
             "Content-Type": "application/json",
             Accept: "application/json",
-            // 認証ヘッダーを削除
+            "apikey": import.meta.env.VITE_SUPABASE_ANON_KEY,
+            "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
           },
           body: JSON.stringify({
             messages: messages
@@ -282,7 +283,7 @@ export function CustomerChat() {
         ) : (
           <>
             <div className="flex-1 overflow-y-auto custom-scrollbar">
-              <div className="text-white text-center py-6 text-xl font-bold">大平シールGPT</div>
+              <div className="text-white text-center py-6 text-xl font-bold">やもりびと</div>
               {messages.map((message, index) => (
                 <ChatMessage
                   key={index}
