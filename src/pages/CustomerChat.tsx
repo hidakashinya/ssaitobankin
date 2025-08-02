@@ -216,7 +216,7 @@ export function CustomerChat() {
             <div className="flex items-center gap-3">
               <MessageSquare className="w-8 h-8 text-white" />
               {isMenuOpen && (
-                <span className="text-white font-bold text-xl">大平シールGPT</span>
+                <span className="text-white font-bold text-xl">やもりびと</span>
               )}
             </div>
           </div>
