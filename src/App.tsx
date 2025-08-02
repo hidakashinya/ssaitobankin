@@ -273,9 +273,8 @@ function MainApp() {
       try {
         const endpoint =
           mode === "internal"
-            ? /* 絶対パスで修正 */
-              "https://cduzfvredqvjuocwzduh.supabase.co/functions/v1/chat-internal"
-            : "https://cduzfvredqvjuocwzduh.supabase.co/functions/v1/chat";
+            ? `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat-internal`
+            : `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
         const response = await fetch(endpoint, {
           method: "POST",
           headers: {
@@ -613,14 +612,16 @@ function MainApp() {
                             : "hover:bg-[#2A2B32]"
                         }`}
                       >
-                        <div className="font-medium text-white line-clamp-2 mb-2">
-                          {log.query}
-                        </div>
-                        <div className="text-sm text-gray-400 flex items-center gap-2">
-                          <Clock className="w-4 h-4" />
-                          <span>
-                            {new Date(log.created_at).toLocaleString("ja-JP")}
+                        <div className="mb-2">
+                          <span className="text-sm text-gray-400">
+                            {new Date(log.created_at).toLocaleString()}
                           </span>
+                        </div>
+                        <div className="font-medium text-white mb-1">
+                          {log.question}
+                        </div>
+                        <div className="text-sm text-gray-300 line-clamp-2">
+                          {log.answer}
                         </div>
                       </button>
                     ))}
@@ -628,252 +629,14 @@ function MainApp() {
                 )}
               </div>
             </div>
-
-            <div className="flex-1 flex flex-col">
-              {selectedLog ? (
-                <>
-                  <div className="p-6 border-b border-gray-600/50">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h2 className="text-xl font-semibold text-white">
-                          会話の詳細
-                        </h2>
-                        <p className="text-sm text-gray-400 mt-1">
-                          {new Date(selectedLog.created_at).toLocaleString(
-                            "ja-JP"
-                          )}
-                        </p>
-                      </div>
-                      {selectedLog.metadata?.user_info?.name && (
-                        <div className="text-sm text-gray-400">
-                          送信者: {selectedLog.metadata.user_info.name}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="flex-1 overflow-y-auto p-6 space-y-8">
-                    <div>
-                      <div className="flex items-center gap-2 text-gray-400 mb-2">
-                        <User className="w-5 h-5" />
-                        <span>質問内容</span>
-                      </div>
-                      <div className="bg-[#2A2B32] rounded-lg p-4">
-                        <div className="prose prose-invert max-w-none">
-                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                            {selectedLog.query}
-                          </ReactMarkdown>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div>
-                      <div className="flex items-center gap-2 text-gray-400 mb-2">
-                        <Bot className="w-5 h-5" />
-                        <span>回答内容</span>
-                      </div>
-                      <div className="bg-[#2A2B32] rounded-lg p-4">
-                        <div className="prose prose-invert max-w-none">
-                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                            {selectedLog.answer}
-                          </ReactMarkdown>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <div className="flex-1 flex items-center justify-center text-gray-400">
-                  <div className="text-center">
-                    <MessageSquare className="w-12 h-12 mx-auto mb-4" />
-                    <p>左側のリストから質問を選択してください</p>
-                  </div>
-                </div>
-              )}
-            </div>
           </div>
-        ) : !selectedThread ? (
-          <WelcomeScreen onSend={handleSend} mode={chatMode} />
         ) : (
-          <>
-            <div className="bg-white border-b px-4 py-3 flex items-center justify-between">
-              <h2 className="text-lg font-semibold">{currentThread?.title}</h2>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => handleToggleFavorite(currentThread!.id)}
-                  className={`p-2 rounded-lg transition-colors ${
-                    currentThread?.isFavorite
-                      ? "text-yellow-500 hover:text-yellow-600"
-                      : "text-gray-400 hover:text-gray-600"
-                  }`}
-                  title={
-                    currentThread?.isFavorite
-                      ? "お気に入りから削除"
-                      : "お気に入りに追加"
-                  }
-                >
-                  <Star
-                    className="w-5 h-5"
-                    fill={currentThread?.isFavorite ? "currentColor" : "none"}
-                  />
-                </button>
-                <button
-                  onClick={() => handleCopyConversation(currentThread!.id)}
-                  className="p-2 text-gray-400 hover:text-gray-600 rounded-lg transition-colors"
-                  title="会話をコピー"
-                >
-                  <Copy className="w-5 h-5" />
-                </button>
-                <div className="relative group">
-                  <button
-                    className="p-2 text-gray-400 hover:text-gray-600 rounded-lg transition-colors"
-                    title="会話をダウンロード"
-                  >
-                    <Download className="w-5 h-5" />
-                  </button>
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 hidden group-hover:block">
-                    <button
-                      onClick={() =>
-                        handleDownloadConversation(currentThread!.id, "text")
-                      }
-                      className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 flex items-center gap-2"
-                    >
-                      <FileDown className="w-4 h-4" />
-                      テキストファイル (.txt)
-                    </button>
-                    <button
-                      onClick={() =>
-                        handleDownloadConversation(
-                          currentThread!.id,
-                          "markdown"
-                        )
-                      }
-                      className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 flex items-center gap-2"
-                    >
-                      <FileDown className="w-4 h-4" />
-                      Markdown (.md)
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="flex-1 overflow-y-auto bg-gray-50">
-              {currentThread?.messages.map((message, index) => (
-                <ChatMessage
-                  key={index}
-                  message={message.text}
-                  isBot={message.isBot}
-                  useTypewriter={message.isBot && index === typingMessageIndex}
-                  onTypewriterComplete={handleTypewriterComplete}
-                  typewriterSpeed={30}
-                />
-              ))}
-              {isLoading && (
-                <div className="flex justify-center p-4">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-                </div>
-              )}
-              <div ref={messagesEndRef} />
-            </div>
-            <ChatInput onSend={handleSend} disabled={isLoading} />
-          </>
+          <div>
+            {/* ここにメインのチャット画面をここに追加 */}
+          </div>
         )}
       </div>
     </div>
-  );
-}
-
-function RequireAuth({ children }: { children: React.ReactNode }) {
-  const { session, loading } = useAuth();
-  const location = useLocation();
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-      </div>
-    );
-  }
-
-  if (!session) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
-  }
-
-  return <>{children}</>;
-}
-
-function App() {
-  return (
-    <AuthProvider>
-      <AppRoutes />
-    </AuthProvider>
-  );
-}
-
-function AppRoutes() {
-  const { session, loading } = useAuth();
-  const location = useLocation();
-
-  // Public routes that don't require authentication
-  const isPublicRoute = (path: string) => {
-    return path.startsWith("/customer") || path.startsWith("/embedded");
-  };
-
-  // Loading state
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-      </div>
-    );
-  }
-
-  return (
-    <Routes>
-      {/* Public routes */}
-      <Route path="/customer/*" element={<CustomerChat />} />
-      <Route path="/embedded/*" element={<EmbeddedChat />} />
-
-      {/* Auth routes */}
-      <Route
-        path="/login"
-        element={session ? <Navigate to="/" replace /> : <LoginPage />}
-      />
-      <Route
-        path="/signup"
-        element={session ? <Navigate to="/" replace /> : <SignupPage />}
-      />
-      <Route
-        path="/reset-password"
-        element={session ? <Navigate to="/" replace /> : <ResetPasswordPage />}
-      />
-
-      {/* Protected routes */}
-      <Route
-        path="/*"
-        element={
-          !session && !isPublicRoute(location.pathname) ? (
-            <Navigate to="/login" state={{ from: location }} replace />
-          ) : (
-            <ProtectedRoutes />
-          )
-        }
-      />
-    </Routes>
-  );
-}
-function ProtectedRoutes() {
-  const location = useLocation();
-  const isPublicRoute =
-    location.pathname.startsWith("/customer") ||
-    location.pathname.startsWith("/embedded");
-
-  return (
-    <Routes>
-      <Route path="/" element={<MainApp />} />
-      <Route path="/internal-chat" element={<InternalChatPage />} />
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
   );
 }
 

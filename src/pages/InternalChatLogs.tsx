@@ -34,7 +34,7 @@ export function InternalChatLogs() {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch('https://cduzfvredqvjuocwzduh.supabase.co/functions/v1/chat-internal-logs', {
+      const response = await fetch('https://ikdjnfxabgltmayfmsca.supabase.co/functions/v1/chat-internal-logs', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
