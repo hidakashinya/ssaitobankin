@@ -62,7 +62,7 @@ interface ChatLog {
   };
 }
 
-function MainApp() {
+function App() {
   const [showTopics, setShowTopics] = React.useState(false);
   const [selectedThread, setSelectedThread] = React.useState<string | null>(
     null
