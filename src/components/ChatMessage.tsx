@@ -60,7 +60,7 @@ export function ChatMessage({
           isBot ? '' : 'bg-purple-500'
         }`}>
           {isBot ? (
-            <img src="https://shinya-hidaka.com/blog/wp-content/uploads/2025/07/higa_icon.jpg" alt="Bot Icon" className="rounded-full" />
+            <img src="https://saitoubankin.co.jp/blog/wp-content/uploads/2025/08/daniel.jpg" alt="Bot Icon" className="rounded-full" />
           ) : (
             <div className="w-5 h-5 bg-white rounded-sm" />
           )}

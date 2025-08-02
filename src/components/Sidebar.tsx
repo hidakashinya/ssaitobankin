@@ -100,7 +100,7 @@ export function Sidebar({
               className="w-full mb-6 text-center"
             >
               <div className="mb-2 py-2 px-4">
-                <h1 className="text-xl font-bold text-white">大平シールGPT</h1>
+                <h1 className="text-xl font-bold text-white">やもりびとGPT</h1>
               </div>
               <div className="flex items-center justify-center gap-2 text-xs text-gray-400">
                 {mode === 'internal' ? (

@@ -10,7 +10,7 @@ interface Message {
 
 export function EmbeddedChat() {
   const [messages, setMessages] = React.useState<Message[]>([
-    { text: "聞きたいことをなんでも書いてください！\n\n※ご質問に対するお答えは、ローズ幸子が毎日更新するブログ・弊社サイトなどの情報をもとに『大平シール-GPT』がお答えさせていただいております!", isBot: true },
+    { text: "聞きたいことをなんでも書いてください！\n\n※ご質問に対するお答えは、ローズ幸子が毎日更新するブログ・弊社サイトなどの情報をもとに『やもりびと-GPT』がお答えさせていただいております!", isBot: true },
   ]);
   const [isLoading, setIsLoading] = React.useState(false);
   const [conversationId, setConversationId] = React.useState<string>();
