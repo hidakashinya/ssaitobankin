@@ -11,7 +11,16 @@ interface Message {
 
 export function EmbeddedChat() {
   const [messages, setMessages] = React.useState<Message[]>([
-    { text: "聞きたいことをなんでも書いてください！\n\n※ご質問に対するお答えは、ブログ・弊社サイトなどの情報をもとにお答えさせていただいております!", isBot: true },
+    { 
+      text: "聞きたいことをなんでも書いてください！\n\n※ご質問に対するお答えは、ブログ・弊社サイトなどの情報をもとにお答えさせていただいております!", 
+      isBot: true,
+      followUpQuestions: [
+        "料金について教えてください",
+        "サービス内容を詳しく知りたいです",
+        "お問い合わせ方法は？",
+        "よくある質問を見たいです"
+      ]
+    },
   ]);
   const [isLoading, setIsLoading] = React.useState(false);
   const [conversationId, setConversationId] = React.useState<string>();
@@ -94,33 +103,20 @@ export function EmbeddedChat() {
       // 実際のフォローアップ質問を取得
       const followUpQuestions = data.follow_up_questions || data.suggested_questions || data.followup_questions || [];
       
-      // デバッグ用: フォローアップ質問がない場合の情報をログに出力
+      // フォローアップ質問がない場合の情報をログに出力（本番では削除可能）
       if (followUpQuestions.length === 0) {
         console.log('No follow-up questions found in response');
-        console.log('Available fields in response:', Object.keys(data));
-        if (data._debug_full_response) {
-          console.log('Full Dify response:', data._debug_full_response);
-        }
       }
-
-      // テスト用: 強制的にフォローアップ質問を表示（デバッグ用）
-      const testFollowUpQuestions = [
-        "詳細を教えてください",
-        "他にもありますか？", 
-        "具体的な手順は？"
-      ];
 
       const botMessage = {
         text: data.choices[0].message.content,
         isBot: true,
         messageId: data.message_id,
-        followUpQuestions: testFollowUpQuestions, // テスト用に強制表示
+        followUpQuestions: followUpQuestions, // 実際のDifyフォローアップ質問を使用
       };
 
-      // デバッグ用: ボットメッセージの内容をログに出力
-      console.log('Bot message created:', botMessage);
-      console.log('Follow-up questions:', botMessage.followUpQuestions);
-      console.log('Is bot:', botMessage.isBot);
+      // ボットメッセージの内容をログに出力（本番では削除可能）
+      console.log('Bot message created with follow-up questions:', botMessage.followUpQuestions?.length || 0);
 
       setMessages((prev) => {
         const newMessages = [...prev, botMessage];
@@ -152,16 +148,7 @@ export function EmbeddedChat() {
   return (
     <div className="flex flex-col h-[600px] bg-[#343541] shadow-lg overflow-hidden">
       <div className="flex-1 overflow-y-auto custom-scrollbar">
-        {messages.map((message, index) => {
-          // デバッグ用: 各メッセージの状態をログに出力
-          console.log(`Message ${index}:`, {
-            isBot: message.isBot,
-            hasFollowUp: !!message.followUpQuestions,
-            followUpLength: message.followUpQuestions?.length || 0,
-            followUpQuestions: message.followUpQuestions
-          });
-          
-          return (
+        {messages.map((message, index) => (
           <div key={index}>
             <ChatMessage
               message={message.text}
@@ -171,14 +158,14 @@ export function EmbeddedChat() {
               typewriterSpeed={30}
             />
             {message.isBot && message.followUpQuestions && message.followUpQuestions.length > 0 && (
-              <div className="px-4 py-2 bg-red-100 border border-red-300 rounded">
-                <div className="text-sm text-red-600 mb-2">🔍 関連する質問（テスト表示）：</div>
+              <div className="px-4 py-2">
+                <div className="text-sm text-gray-400 mb-2">関連する質問：</div>
                 <div className="flex flex-wrap gap-2">
                   {message.followUpQuestions.map((question, qIndex) => (
                     <button
                       key={qIndex}
                       onClick={() => handleFollowUpClick(question)}
-                      className="bg-red-500 hover:bg-red-600 text-white text-sm px-3 py-1 rounded-full transition-colors duration-200 border border-red-600 hover:border-red-500"
+                      className="bg-gray-700 hover:bg-gray-600 text-white text-sm px-3 py-1 rounded-full transition-colors duration-200 border border-gray-600 hover:border-gray-500"
                       disabled={isLoading}
                     >
                       {question}
@@ -188,8 +175,7 @@ export function EmbeddedChat() {
               </div>
             )}
           </div>
-          );
-        })}
+        ))}
         {isLoading && (
           <div className="flex justify-center p-4">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
