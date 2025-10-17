@@ -64,6 +64,10 @@ export function EmbeddedChat() {
       }
 
       const data = await response.json();
+      
+      // デバッグ用: APIレスポンスをコンソールに出力
+      console.log('Dify API Response:', data);
+      console.log('Follow-up questions:', data.follow_up_questions);
 
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
       const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -87,11 +91,23 @@ export function EmbeddedChat() {
 
       setConversationId(data.conversation_id);
       
+      // 実際のフォローアップ質問を取得
+      const followUpQuestions = data.follow_up_questions || data.suggested_questions || data.followup_questions || [];
+      
+      // デバッグ用: フォローアップ質問がない場合の情報をログに出力
+      if (followUpQuestions.length === 0) {
+        console.log('No follow-up questions found in response');
+        console.log('Available fields in response:', Object.keys(data));
+        if (data._debug_full_response) {
+          console.log('Full Dify response:', data._debug_full_response);
+        }
+      }
+
       const botMessage = {
         text: data.choices[0].message.content,
         isBot: true,
         messageId: data.message_id,
-        followUpQuestions: data.follow_up_questions || [],
+        followUpQuestions: followUpQuestions,
       };
 
       setMessages((prev) => {

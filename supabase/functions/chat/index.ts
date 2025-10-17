@@ -85,7 +85,7 @@ Deno.serve(async (req) => {
       }
 
       const data = await difyResponse.json();
-      console.log('Dify API response received');
+      console.log('Dify API response received:', JSON.stringify(data, null, 2));
 
       return new Response(
         JSON.stringify({
@@ -96,7 +96,11 @@ Deno.serve(async (req) => {
               content: data.answer
             }
           }],
-          metadata: data.metadata
+          metadata: data.metadata,
+          // Difyのフォローアップ質問を転送
+          follow_up_questions: data.follow_up_questions || data.suggested_questions || data.followup_questions || [],
+          // デバッグ用: 完全なレスポンスをログに出力
+          _debug_full_response: data
         }),
         {
           status: 200,
