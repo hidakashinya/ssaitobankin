@@ -105,19 +105,37 @@ export function EmbeddedChat() {
       const followUpQuestions = data.follow_up_questions || data.suggested_questions || data.followup_questions || [];
       
       // フォローアップ質問のデバッグ情報を出力
+      console.log('=== DIFY FOLLOW-UP DEBUG ===');
       console.log('Follow-up questions from Dify:', followUpQuestions);
       console.log('Full API response:', data);
+      console.log('Response keys:', Object.keys(data));
+      
+      // 各フィールドを個別にチェック
+      console.log('data.follow_up_questions:', data.follow_up_questions);
+      console.log('data.suggested_questions:', data.suggested_questions);
+      console.log('data.followup_questions:', data.followup_questions);
+      console.log('data.metadata:', data.metadata);
       
       if (followUpQuestions.length === 0) {
-        console.log('No follow-up questions found in response');
+        console.log('❌ No follow-up questions found in response');
         console.log('Available response fields:', Object.keys(data));
+      } else {
+        console.log('✅ Found follow-up questions:', followUpQuestions);
       }
+
+      // フォローアップ質問がない場合のフォールバック
+      const finalFollowUpQuestions = followUpQuestions.length > 0 ? followUpQuestions : [
+        "詳しい修理方法を教えてください",
+        "料金の詳細はありますか？",
+        "緊急時はどうすればいいですか？",
+        "保証について教えてください"
+      ];
 
       const botMessage = {
         text: data.choices[0].message.content,
         isBot: true,
         messageId: data.message_id,
-        followUpQuestions: followUpQuestions, // 実際のDifyフォローアップ質問を使用
+        followUpQuestions: finalFollowUpQuestions,
       };
 
       // ボットメッセージの内容をログに出力（本番では削除可能）
