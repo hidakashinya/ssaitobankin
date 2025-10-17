@@ -86,6 +86,7 @@ Deno.serve(async (req) => {
 
       const data = await difyResponse.json();
       console.log('Dify API response received:', JSON.stringify(data, null, 2));
+      console.log('Follow-up questions in Dify response:', data.follow_up_questions || data.suggested_questions || data.followup_questions || 'None found');
 
       return new Response(
         JSON.stringify({

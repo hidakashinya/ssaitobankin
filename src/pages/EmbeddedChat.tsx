@@ -15,10 +15,11 @@ export function EmbeddedChat() {
       text: "聞きたいことをなんでも書いてください！\n\n※ご質問に対するお答えは、ブログ・弊社サイトなどの情報をもとにお答えさせていただいております!", 
       isBot: true,
       followUpQuestions: [
-        "料金について教えてください",
-        "サービス内容を詳しく知りたいです",
-        "お問い合わせ方法は？",
-        "よくある質問を見たいです"
+        "ホームページ制作の料金はいくらですか？",
+        "SEO対策はどのように行いますか？",
+        "制作期間はどのくらいかかりますか？",
+        "アフターサポートはありますか？",
+        "実績や事例を見せてください"
       ]
     },
   ]);
@@ -103,9 +104,13 @@ export function EmbeddedChat() {
       // 実際のフォローアップ質問を取得
       const followUpQuestions = data.follow_up_questions || data.suggested_questions || data.followup_questions || [];
       
-      // フォローアップ質問がない場合の情報をログに出力（本番では削除可能）
+      // フォローアップ質問のデバッグ情報を出力
+      console.log('Follow-up questions from Dify:', followUpQuestions);
+      console.log('Full API response:', data);
+      
       if (followUpQuestions.length === 0) {
         console.log('No follow-up questions found in response');
+        console.log('Available response fields:', Object.keys(data));
       }
 
       const botMessage = {
