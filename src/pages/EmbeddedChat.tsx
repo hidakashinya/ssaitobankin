@@ -6,6 +6,7 @@ interface Message {
   text: string;
   isBot: boolean;
   messageId?: string;
+  followUpQuestions?: string[];
 }
 
 export function EmbeddedChat() {
@@ -90,6 +91,7 @@ export function EmbeddedChat() {
         text: data.choices[0].message.content,
         isBot: true,
         messageId: data.message_id,
+        followUpQuestions: data.follow_up_questions || [],
       };
 
       setMessages((prev) => {
@@ -115,18 +117,40 @@ export function EmbeddedChat() {
     setTypingMessageIndex(null);
   };
 
+  const handleFollowUpClick = (question: string) => {
+    handleSend(question);
+  };
+
   return (
     <div className="flex flex-col h-[600px] bg-[#343541] shadow-lg overflow-hidden">
       <div className="flex-1 overflow-y-auto custom-scrollbar">
         {messages.map((message, index) => (
-          <ChatMessage
-            key={index}
-            message={message.text}
-            isBot={message.isBot}
-            useTypewriter={message.isBot && index === typingMessageIndex}
-            onTypewriterComplete={handleTypewriterComplete}
-            typewriterSpeed={30}
-          />
+          <div key={index}>
+            <ChatMessage
+              message={message.text}
+              isBot={message.isBot}
+              useTypewriter={message.isBot && index === typingMessageIndex}
+              onTypewriterComplete={handleTypewriterComplete}
+              typewriterSpeed={30}
+            />
+            {message.isBot && message.followUpQuestions && message.followUpQuestions.length > 0 && (
+              <div className="px-4 py-2">
+                <div className="text-sm text-gray-400 mb-2">関連する質問：</div>
+                <div className="flex flex-wrap gap-2">
+                  {message.followUpQuestions.map((question, qIndex) => (
+                    <button
+                      key={qIndex}
+                      onClick={() => handleFollowUpClick(question)}
+                      className="bg-gray-700 hover:bg-gray-600 text-white text-sm px-3 py-1 rounded-full transition-colors duration-200 border border-gray-600 hover:border-gray-500"
+                      disabled={isLoading}
+                    >
+                      {question}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         ))}
         {isLoading && (
           <div className="flex justify-center p-4">
